@@ -1,0 +1,5 @@
+#/bin/sh
+while true; do
+	xsetroot -name "$(nmcli -t -f NAME c show --active | head -n 1) | $(cat /sys/class/power_supply/BAT1/capacity) % | $(date +'%Y-%m-%d %H:%M')"
+	sleep 2
+done
