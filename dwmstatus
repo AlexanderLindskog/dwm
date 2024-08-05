@@ -1,5 +1,18 @@
 #/bin/sh
 while true; do
-	xsetroot -name "$(nmcli -t -f NAME c show --active | head -n 1) | $(cat /sys/class/power_supply/BAT1/capacity) % | $(date +'%Y-%m-%d %H:%M')"
+    time="$(date +'%Y-%m-%d %H:%M')"
+
+    battery_status="$(head -c 3 /sys/class/power_supply/BAT1/status | tr 'a-z' 'A-Z')"
+    case $battery_status in
+        "DIS")
+            battery_status=""
+            ;;
+    esac
+    battery="$(cat /sys/class/power_supply/BAT1/capacity) %"
+
+    internet="$(nmcli -t -f NAME c show --active | head -n 1)"
+
+	xsetroot -name " ${internet} | ${battery} | ${time}"
+
 	sleep 2
 done
