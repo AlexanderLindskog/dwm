@@ -1,18 +1,46 @@
 #/bin/sh
-while true; do
+update_status () {
     time="$(date +'%Y-%m-%d %H:%M')"
 
-    battery_status="$(head -c 3 /sys/class/power_supply/BAT1/status | tr 'a-z' 'A-Z')"
+    battery_status="$(cat /sys/class/power_supply/BAT1/status | tr 'a-z' 'A-Z')"
     case $battery_status in
-        "DIS")
+        "DISCHARGING")
             battery_status=""
             ;;
+        "CHARGING")
+            battery_status="CHA "
+            ;;
+        "")
+            ;;
+        *)
+            battery_status+=" "
+            ;;
     esac
-    battery="$(cat /sys/class/power_supply/BAT1/capacity) %"
+    battery_percent="$(cat /sys/class/power_supply/BAT1/capacity)"
+    battery="${battery_status}${battery_percent} %"
 
     internet="$(nmcli -t -f NAME c show --active | head -n 1)"
 
-	xsetroot -name " ${internet} | ${battery} | ${time}"
+    audio="$(awk -F"[][]" '/Left:/ { print $2 }' <(amixer sget Master))"
+    if [ "$(awk -F"[][]" '/Left:/ { print $4 }' <(amixer sget Master))" == "off" ]; then
+        audio="[${audio}]"
+    fi
+    audio="♪ ${audio}"
+    
+    bluetooth=""
+    if [ "$(awk '/Powered:/ { print $NF }' <(bluetoothctl show))" == "yes" ]; then
+        bluetooth="B: $(awk '{ for (i=3; i<NF; ++i) printf $i" "; print $NF }' <(bluetoothctl devices Connected)) | "
+    fi
 
-	sleep 2
-done
+	xsetroot -name " ${bluetooth}${audio} | ${internet} | ${battery} | ${time}"
+}
+
+if [ $1 == "inf" ]; then
+    while true; do
+        update_status
+        sleep 1
+    done
+else
+    update_status
+fi
+

@@ -60,11 +60,27 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "st", NULL };
+static const char *browsercmd[]  = { "firefox", NULL };
+static const char *upvol[]    = { "/usr/bin/amixer",  "set", "Master", "5%+", NULL };
+static const char *downvol[]  = { "/usr/bin/amixer",  "set", "Master", "5%-", NULL };
+static const char *mutevol[]  = { "/usr/bin/amixer",  "set", "Master", "toggle", NULL };
+static const char *updatestatusbar[]  = { "/home/alex/.config/dwm/dwmstatus", NULL };
+static const char *uplight[]   = { "sudo", "/usr/bin/xbacklight",  "-inc", "10", NULL };
+static const char *downlight[] = { "sudo", "/usr/bin/xbacklight",  "-dec", "10", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
+	{ MODKEY|ShiftMask,             XK_b,      spawn,          {.v = browsercmd } },
+    { 0,            XF86XK_AudioLowerVolume,   spawn,          {.v = updatestatusbar } },
+	{ 0,            XF86XK_AudioMute,          spawn,          {.v = updatestatusbar } },
+	{ 0,            XF86XK_AudioRaiseVolume,   spawn,          {.v = updatestatusbar } },
+    { 0,            XF86XK_AudioLowerVolume,   spawn,          {.v = downvol } },
+	{ 0,            XF86XK_AudioMute,          spawn,          {.v = mutevol } },
+	{ 0,            XF86XK_AudioRaiseVolume,   spawn,          {.v = upvol   } },
+	{ 0,            XF86XK_MonBrightnessUp,    spawn,          {.v = uplight   } },
+	{ 0,            XF86XK_MonBrightnessDown,  spawn,          {.v = downlight } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
